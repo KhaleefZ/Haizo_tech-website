@@ -53,8 +53,3 @@ The repository is structured into three main applications:
    npm install
    npm run dev  # Starts Next.js app on port 3001
    ```
-
-## Default Credentials (Development)
-After running the backend seed script, log into the Admin Dashboard (`http://localhost:3000`) with:
-- **Email**: `admin@haizotech.com`
-- **Password**: `password123`

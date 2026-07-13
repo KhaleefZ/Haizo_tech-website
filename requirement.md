@@ -111,7 +111,3 @@ The Prisma schema defines the following core models:
    npm run dev  # Starts Next.js app on port 3001
    ```
 
-### Default Credentials
-After running the seed script, log into the Admin Dashboard (`http://localhost:3000`) with:
-- **Email**: `admin@haizotech.com`
-- **Password**: `password123`

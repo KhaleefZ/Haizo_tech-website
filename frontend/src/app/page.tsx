@@ -28,7 +28,7 @@ export default function Home() {
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           {/* Stars Background with slow rotation */}
           <div 
-            className="absolute inset-[-50%] opacity-40 animate-[spin_120s_linear_infinite]"
+            className="absolute inset-[-50%] opacity-40 animate-spin-slow"
             style={{ 
               backgroundImage: 'radial-gradient(1.5px 1.5px at 10% 20%, white, transparent), radial-gradient(2px 2px at 30% 60%, white, transparent), radial-gradient(1px 1px at 50% 40%, white, transparent), radial-gradient(2px 2px at 70% 80%, white, transparent), radial-gradient(1.5px 1.5px at 90% 10%, white, transparent), radial-gradient(1px 1px at 20% 90%, white, transparent), radial-gradient(1.5px 1.5px at 80% 30%, white, transparent)', 
               backgroundSize: '250px 250px' 
@@ -36,7 +36,7 @@ export default function Home() {
           />
           {/* Additional twinkling stars with counter-rotation */}
           <div 
-            className="absolute inset-[-50%] opacity-20 animate-[spin_90s_linear_infinite_reverse]"
+            className="absolute inset-[-50%] opacity-20 animate-spin-reverse"
             style={{ 
               backgroundImage: 'radial-gradient(1px 1px at 15% 15%, white, transparent), radial-gradient(1.5px 1.5px at 85% 65%, white, transparent), radial-gradient(2px 2px at 45% 85%, white, transparent)', 
               backgroundSize: '300px 300px' 
@@ -51,10 +51,14 @@ export default function Home() {
           </div>
 
           {/* Central Glowing Orbs with Blob animation */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/30 rounded-full blur-[120px] mix-blend-screen animate-blob" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+            <div className="w-[600px] h-[600px] bg-purple-600/30 rounded-full blur-[120px] mix-blend-screen animate-blob" />
+          </div>
           
           {/* Secondary subtle orb for depth with delayed blob animation */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+            <div className="w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
+          </div>
         </div>
 
         <div className="container mx-auto flex flex-col items-center text-center relative z-10 max-w-4xl">
