@@ -95,6 +95,7 @@ export default async function WorkDetailsPage({
                   src={getImageUrl(project.imageUrls[0])} 
                   alt={`${project.title} - Featured`}
                   fill
+                  unoptimized
                   sizes="(max-width: 768px) 100vw, 66vw"
                   className="object-cover"
                   priority
@@ -108,6 +109,7 @@ export default async function WorkDetailsPage({
                       src={getImageUrl(url)} 
                       alt={`${project.title} - Detail ${idx + 1}`}
                       fill
+                      unoptimized
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
                     />
@@ -128,6 +130,7 @@ export default async function WorkDetailsPage({
                 src={getImageUrl(project.imageUrls?.[0] || null)} 
                 alt={project.title}
                 fill
+                unoptimized
                 sizes="100vw"
                 className="object-cover"
                 priority

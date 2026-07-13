@@ -6,7 +6,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import CountUp from "@/components/ui/CountUp";
 import TypewriterText from "@/components/ui/TypewriterText";
 import Link from "next/link";
-import { ArrowRight, Code2, Database, Layout, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, Database, Layout, ShieldCheck, Zap } from "lucide-react";
 import FloatingPrisms from "@/components/ui/FloatingPrisms";
 import IsometricTerminal from "@/components/ui/IsometricTerminal";
 import FeedbackMarquee from "@/components/ui/FeedbackMarquee";
@@ -23,20 +23,42 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-24 pb-20">
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 lg:pt-32 lg:pb-24 flex items-center justify-center px-6 overflow-hidden">
+      <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 flex items-center justify-center px-6 overflow-hidden min-h-[80vh]">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
-          {/* Animated Grid */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50" />
+          {/* Stars Background with slow rotation */}
+          <div 
+            className="absolute inset-[-50%] opacity-40 animate-[spin_120s_linear_infinite]"
+            style={{ 
+              backgroundImage: 'radial-gradient(1.5px 1.5px at 10% 20%, white, transparent), radial-gradient(2px 2px at 30% 60%, white, transparent), radial-gradient(1px 1px at 50% 40%, white, transparent), radial-gradient(2px 2px at 70% 80%, white, transparent), radial-gradient(1.5px 1.5px at 90% 10%, white, transparent), radial-gradient(1px 1px at 20% 90%, white, transparent), radial-gradient(1.5px 1.5px at 80% 30%, white, transparent)', 
+              backgroundSize: '250px 250px' 
+            }} 
+          />
+          {/* Additional twinkling stars with counter-rotation */}
+          <div 
+            className="absolute inset-[-50%] opacity-20 animate-[spin_90s_linear_infinite_reverse]"
+            style={{ 
+              backgroundImage: 'radial-gradient(1px 1px at 15% 15%, white, transparent), radial-gradient(1.5px 1.5px at 85% 65%, white, transparent), radial-gradient(2px 2px at 45% 85%, white, transparent)', 
+              backgroundSize: '300px 300px' 
+            }} 
+          />
+          
+          {/* Floating glowing particles using absolute positioning and pulse */}
+          <div className="absolute inset-0 opacity-50 pointer-events-none">
+             <div className="absolute top-[20%] left-[20%] w-2 h-2 bg-purple-400 rounded-full blur-[2px] animate-[pulse_4s_ease-in-out_infinite]" />
+             <div className="absolute top-[60%] right-[30%] w-3 h-3 bg-blue-400 rounded-full blur-[3px] animate-[pulse_6s_ease-in-out_infinite_1s]" />
+             <div className="absolute bottom-[20%] left-[40%] w-2 h-2 bg-pink-400 rounded-full blur-[2px] animate-[pulse_5s_ease-in-out_infinite_2s]" />
+          </div>
 
-          {/* Floating Neon Orbs */}
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] mix-blend-screen animate-[blob_10s_infinite]" />
-          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] mix-blend-screen animate-[blob_12s_infinite_2s]" />
-          <div className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] mix-blend-screen animate-[blob_15s_infinite_4s]" />
+          {/* Central Glowing Orbs with Blob animation */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/30 rounded-full blur-[120px] mix-blend-screen animate-blob" />
+          
+          {/* Secondary subtle orb for depth with delayed blob animation */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] mix-blend-screen animate-blob" style={{ animationDelay: '2s' }} />
         </div>
 
-        <div className="container mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
-          <AnimatedSection className="space-y-4 z-10" delay={0.1} variant="slideRight">
+        <div className="container mx-auto flex flex-col items-center text-center relative z-10 max-w-4xl">
+          <AnimatedSection delay={0.1} variant="fadeUp" className="w-full flex flex-col items-center">
             <motion.h1
               initial="hidden"
               animate="visible"
@@ -44,20 +66,26 @@ export default function Home() {
                 hidden: { opacity: 1 },
                 visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } }
               }}
-              className="text-3xl sm:text-4xl lg:text-5xl 2xl:text-6xl font-extrabold tracking-tight leading-[1.05]"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 text-white"
             >
               <motion.span variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="block">Transforming Business Through</motion.span>
-              <motion.span variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="block hover:scale-105 transition-transform duration-300 transform-origin-left w-fit whitespace-nowrap">
+              <motion.span variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="block hover:scale-105 transition-transform duration-300 w-fit mx-auto">
                 <TypewriterText
                   words={["Custom Software & AI", "Web & Mobile Application", "AI System & Integration", "Network & IT Solutions"]}
                   textClassName="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"
                 />
               </motion.span>
             </motion.h1>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed">
+          </AnimatedSection>
+
+          <AnimatedSection delay={0.3} variant="fadeUp">
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-10">
               We are a premier technology agency specializing in custom web and mobile applications, scalable cloud infrastructure, artificial intelligence, and enterprise-grade software solutions to accelerate your digital growth.
             </p>
-            <div className="flex flex-wrap gap-4 pt-2">
+          </AnimatedSection>
+
+          <AnimatedSection delay={0.4} variant="fadeUp" className="w-full">
+            <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-medium transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] flex items-center gap-2 hover:scale-105"
@@ -70,16 +98,6 @@ export default function Home() {
               >
                 Explore Services
               </Link>
-            </div>
-          </AnimatedSection>
-
-          <AnimatedSection className="relative z-10 mt-12 lg:mt-0" delay={0.3} variant="scaleUp">
-            <div className="relative w-full aspect-square max-w-lg mx-auto flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 rounded-full animate-pulse blur-3xl mix-blend-screen opacity-50" />
-
-              {/* Isometric Terminal */}
-              <IsometricTerminal />
-
             </div>
           </AnimatedSection>
         </div>
