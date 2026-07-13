@@ -29,7 +29,7 @@ export function KanbanBoard() {
 
   const fetchBoard = async (projectId: string) => {
     try {
-      const boardRes = await fetch(`http://localhost:5001/api/projects/${projectId}/kanban`, {
+      const boardRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}/kanban`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (!boardRes.ok) return;
@@ -64,7 +64,7 @@ export function KanbanBoard() {
   const handleInitKanban = async () => {
     if (!selectedProjectId) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/projects/${selectedProjectId}/init-kanban`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProjectId}/init-kanban`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
@@ -79,7 +79,7 @@ export function KanbanBoard() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await fetch('http://localhost:5001/api/projects', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         });
         if (res.ok) {
@@ -243,7 +243,7 @@ export function KanbanBoard() {
         setColumns((cols) => arrayMove(cols, oldIndex, newIndex));
         
         try {
-          const res = await fetch(`http://localhost:5001/api/projects/columns/${active.id}/move`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/columns/${active.id}/move`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
@@ -272,7 +272,7 @@ export function KanbanBoard() {
 
     // API Call
     try {
-      const res = await fetch(`http://localhost:5001/api/tasks/${taskId}/move`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${taskId}/move`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

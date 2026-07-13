@@ -27,7 +27,7 @@ export function SystemHealthWidget({ counts, analytics }: { counts?: any, analyt
   const handleExport = async () => {
     try {
       setIsExporting(true);
-      const res = await fetchWithAuth('http://localhost:5001/api/backup/export');
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/backup/export`);
       if (!res.ok) throw new Error('Export failed');
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
@@ -48,7 +48,7 @@ export function SystemHealthWidget({ counts, analytics }: { counts?: any, analyt
   const handleBackup = async () => {
     try {
       setIsBackingUp(true);
-      const res = await fetchWithAuth('http://localhost:5001/api/backup/db');
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/backup/db`);
       if (!res.ok) throw new Error('Backup failed');
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);

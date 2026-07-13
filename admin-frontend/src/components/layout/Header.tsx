@@ -41,7 +41,7 @@ export function Header() {
     // Fetch initial notifications
     const fetchNotifications = async () => {
       try {
-        const res = await fetchWithAuth('http://localhost:5001/api/notifications');
+        const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`);
         if (res.ok) {
           const data = await res.json();
           // Map backend format to frontend Notification format if needed
@@ -88,7 +88,7 @@ export function Header() {
 
   const markAsRead = async (id: string) => {
     try {
-      await fetchWithAuth(`http://localhost:5001/api/notifications/${id}/read`, {
+      await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${id}/read`, {
         method: 'PATCH',
       });
       setNotifications((prev) => 

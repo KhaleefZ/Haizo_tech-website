@@ -47,7 +47,7 @@ export function TaskStatusModal({ task, onClose, onUpdate }: TaskStatusModalProp
       const isCompleted = status === 'completed';
       const reason = status === 'delayed' ? delayReason : null;
 
-      const res = await fetchWithAuth(`http://localhost:5001/api/tasks/${task.id}`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${task.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

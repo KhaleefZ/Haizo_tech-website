@@ -24,7 +24,7 @@ export function BlogsTable() {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/blogs');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs`);
       if (response.ok) {
         const result = await response.json();
         setData(result);
@@ -43,7 +43,7 @@ export function BlogsTable() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this blog?')) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/blogs/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });

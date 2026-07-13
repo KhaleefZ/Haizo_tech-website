@@ -41,7 +41,7 @@ export function WorkEditorModal({ work, trigger, onSuccess }: WorkEditorModalPro
 
   useEffect(() => {
     if (open) {
-      fetchWithAuth('http://localhost:5001/api/work-categories')
+      fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories`)
         .then(res => res.json())
         .then(data => setCategories(data))
         .catch(console.error);
@@ -70,7 +70,7 @@ export function WorkEditorModal({ work, trigger, onSuccess }: WorkEditorModalPro
     
     setUploading(true);
     try {
-      const res = await fetchWithAuth('http://localhost:5001/api/upload', {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
         method: 'POST',
         body: formDataObj,
       });
@@ -96,7 +96,7 @@ export function WorkEditorModal({ work, trigger, onSuccess }: WorkEditorModalPro
     try {
       if (imageUrl.startsWith('/uploads/')) {
         const filename = imageUrl.split('/').pop();
-        await fetchWithAuth(`http://localhost:5001/api/upload/${filename}`, {
+        await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${filename}`, {
           method: 'DELETE'
         });
       }
@@ -114,7 +114,7 @@ export function WorkEditorModal({ work, trigger, onSuccess }: WorkEditorModalPro
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const url = isEditing ? `http://localhost:5001/api/works/${work.id}` : 'http://localhost:5001/api/works';
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/works/${work.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/works`;
       const method = isEditing ? 'PUT' : 'POST';
       const res = await fetchWithAuth(url, {
         method,
@@ -232,7 +232,7 @@ export function WorkEditorModal({ work, trigger, onSuccess }: WorkEditorModalPro
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.imageUrls.map((url, index) => (
                   <div key={index} className="relative group">
-                    <img src={url.startsWith('http') ? url : `http://localhost:5001${url}`} alt="Preview" className="h-20 w-auto rounded border border-white/10 object-cover" />
+                    <img src={url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_URL}${url}`} alt="Preview" className="h-20 w-auto rounded border border-white/10 object-cover" />
                     {!isDev && (
                       <button
                         type="button"

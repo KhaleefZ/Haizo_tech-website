@@ -16,7 +16,7 @@ type Blog = {
 
 async function getBlogs(): Promise<Blog[]> {
   try {
-    const res = await fetch('http://localhost:5001/api/blogs', { 
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs`, { 
       cache: 'no-store' // Fetch dynamically
     });
     if (!res.ok) throw new Error('Failed to fetch');
@@ -49,7 +49,7 @@ export default async function BlogPage() {
   const getImageUrl = (url: string | null) => {
     if (!url) return defaultImage;
     if (url.startsWith('http')) return url;
-    return `http://localhost:5001${url}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
   };
 
   return (

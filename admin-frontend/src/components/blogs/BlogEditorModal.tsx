@@ -62,7 +62,7 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
     
     setUploading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/upload', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
         method: 'POST',
         body: formDataObj,
       });
@@ -84,7 +84,7 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
     try {
       if (imageUrl.startsWith('/uploads/')) {
         const filename = imageUrl.split('/').pop();
-        await fetch(`http://localhost:5001/api/upload/${filename}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${filename}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -102,7 +102,7 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
     if (e) e.preventDefault();
     setLoading(true);
     try {
-      const url = isEditing ? `http://localhost:5001/api/blogs/${blog?.id}` : 'http://localhost:5001/api/blogs';
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${blog?.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/blogs`;
       const method = isEditing ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,
@@ -192,7 +192,7 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
                 {uploading && <p className="text-xs text-blue-400 mt-1">Uploading...</p>}
                 {formData.imageUrl && (
                   <div className="relative group inline-block mt-2">
-                    <img src={formData.imageUrl.startsWith('http') ? formData.imageUrl : `http://localhost:5001${formData.imageUrl}`} alt="Preview" className="h-24 w-auto rounded border border-white/10 object-cover" />
+                    <img src={formData.imageUrl.startsWith('http') ? formData.imageUrl : `${process.env.NEXT_PUBLIC_API_URL}${formData.imageUrl}`} alt="Preview" className="h-24 w-auto rounded border border-white/10 object-cover" />
                     {!isDev && (
                       <button
                         type="button"

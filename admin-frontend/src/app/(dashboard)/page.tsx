@@ -12,7 +12,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    fetch('http://localhost:5001/api/dashboard/stats', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard/stats`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
     .then(async res => {

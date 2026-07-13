@@ -51,7 +51,7 @@ export function ClientEditorModal({ client, trigger, onSuccess }: ClientEditorMo
 
     setLoading(true);
     try {
-      const url = isEditing ? `http://localhost:5001/api/clients/${client.id}` : 'http://localhost:5001/api/clients';
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/clients/${client.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/clients`;
       const method = isEditing ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,

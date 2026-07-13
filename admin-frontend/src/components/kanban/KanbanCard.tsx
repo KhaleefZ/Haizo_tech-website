@@ -46,7 +46,7 @@ export function KanbanCard({ task }: KanbanCardProps) {
     if (!confirm('Are you sure you want to delete this task?')) return;
     setIsDeleting(true);
     try {
-      const res = await fetchWithAuth(`http://localhost:5001/api/tasks/${task.id}`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${task.id}`, {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Failed to delete task');

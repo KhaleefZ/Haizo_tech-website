@@ -27,7 +27,7 @@ export function CategoriesManager() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetchWithAuth('http://localhost:5001/api/work-categories');
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories`);
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
@@ -50,7 +50,7 @@ export function CategoriesManager() {
     }
     setLoading(true);
     try {
-      const res = await fetchWithAuth('http://localhost:5001/api/work-categories', {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ export function CategoriesManager() {
   const handleUpdate = async (id: string) => {
     if (!editingName.trim()) return;
     try {
-      const res = await fetchWithAuth(`http://localhost:5001/api/work-categories/${id}`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ export function CategoriesManager() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this category?')) return;
     try {
-      const res = await fetchWithAuth(`http://localhost:5001/api/work-categories/${id}`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories/${id}`, {
         method: 'DELETE'
       });
       if (res.ok) {
@@ -123,7 +123,7 @@ export function CategoriesManager() {
 
     // Save to backend
     try {
-      await fetchWithAuth('http://localhost:5001/api/work-categories/reorder', {
+      await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories/reorder`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

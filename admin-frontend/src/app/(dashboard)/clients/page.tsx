@@ -15,7 +15,7 @@ export default function ClientsPage() {
 
   const fetchClients = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/clients', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/clients`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.ok) {
@@ -35,7 +35,7 @@ export default function ClientsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this client?')) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/clients/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/clients/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });

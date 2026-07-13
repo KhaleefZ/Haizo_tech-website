@@ -24,7 +24,7 @@ export function ProjectsTable() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch('http://localhost:5001/api/projects', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (res.ok) setData(await res.json());
@@ -42,7 +42,7 @@ export function ProjectsTable() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
     try {
-      const res = await fetch(`http://localhost:5001/api/projects/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });

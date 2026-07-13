@@ -15,7 +15,7 @@ type Blog = {
 
 async function getBlog(id: string): Promise<Blog | null> {
   try {
-    const res = await fetch(`http://localhost:5001/api/blogs/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -45,7 +45,7 @@ export default async function BlogPost({
   const getImageUrl = (url: string | null) => {
     if (!url) return defaultImage;
     if (url.startsWith('http')) return url;
-    return `http://localhost:5001${url}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
   };
   const coverImage = getImageUrl(post.imageUrl);
   const category = post.tags && post.tags.length > 0 ? post.tags[0] : "Technology Insight";

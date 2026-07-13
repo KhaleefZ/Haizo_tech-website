@@ -27,7 +27,7 @@ export default function InvitePage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:5001/api/admin/users/set-password', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/set-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password })

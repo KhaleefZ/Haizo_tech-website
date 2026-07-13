@@ -45,8 +45,8 @@ export function AnnouncementEditorModal({ isOpen, onClose, onSaved, announcement
 
     try {
       const url = announcement
-        ? `http://localhost:5001/api/announcements/${announcement.id}`
-        : 'http://localhost:5001/api/announcements';
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/announcements/${announcement.id}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/announcements`;
       const method = announcement ? 'PUT' : 'POST';
 
       const res = await fetch(url, {

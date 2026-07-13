@@ -32,7 +32,7 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
 
   useEffect(() => {
     if (open) {
-      fetch('http://localhost:5001/api/admin/users/profile', {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/profile`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       })
       .then(res => res.json())
@@ -53,7 +53,7 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
     setLoading(true);
     try {
       // Update basic profile
-      await fetch('http://localhost:5001/api/admin/users/profile', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/profile`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
 
       // Update password if provided
       if (formData.currentPassword && formData.newPassword) {
-        const passRes = await fetch('http://localhost:5001/api/admin/users/security', {
+        const passRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/security`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -104,14 +104,14 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
             <div className="flex items-center gap-4">
               {formData.avatarUrl && (
                 <div className="relative group">
-                  <img src={formData.avatarUrl.startsWith('http') ? formData.avatarUrl : `http://localhost:5001${formData.avatarUrl}`} alt="Avatar" className="w-16 h-16 rounded-full object-cover border border-white/10" />
+                  <img src={formData.avatarUrl.startsWith('http') ? formData.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL}${formData.avatarUrl}`} alt="Avatar" className="w-16 h-16 rounded-full object-cover border border-white/10" />
                   <button
                     type="button"
                     onClick={async () => {
                       try {
                         if (formData.avatarUrl.startsWith('/uploads/')) {
                           const filename = formData.avatarUrl.split('/').pop();
-                          await fetch(`http://localhost:5001/api/upload/${filename}`, {
+                          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${filename}`, {
                             method: 'DELETE',
                             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                           });
@@ -138,7 +138,7 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
                     const formDataObj = new FormData();
                     formDataObj.append('image', e.target.files[0]);
                     try {
-                      const res = await fetch('http://localhost:5001/api/upload', {
+                      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
                         method: 'POST',
                         body: formDataObj,
                       });

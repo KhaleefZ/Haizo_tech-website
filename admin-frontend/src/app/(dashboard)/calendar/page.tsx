@@ -44,7 +44,7 @@ export default function CalendarPage() {
   const isAdmin = role === 'SUPER_ADMIN' || role === 'MANAGER';
 
   useEffect(() => {
-    fetchWithAuth('http://localhost:5001/api/projects')
+    fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`)
       .then(async res => {
         if (!res.ok) throw new Error('Failed to fetch projects');
         const data = await res.json();
@@ -59,7 +59,7 @@ export default function CalendarPage() {
   useEffect(() => {
     if (!selectedProjectId) return;
 
-    fetchWithAuth(`http://localhost:5001/api/projects/${selectedProjectId}/kanban`)
+    fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${selectedProjectId}/kanban`)
       .then(async res => {
         if (!res.ok) throw new Error('Failed to fetch kanban board');
         const data = await res.json();

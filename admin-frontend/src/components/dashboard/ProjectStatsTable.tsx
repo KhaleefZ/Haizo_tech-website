@@ -15,7 +15,7 @@ export function ProjectStatsTable() {
 
   const loadProjects = async () => {
     try {
-      const res = await fetchWithAuth('http://localhost:5001/api/projects');
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`);
       if (res.ok) {
         const data = await res.json();
         setProjects(data);

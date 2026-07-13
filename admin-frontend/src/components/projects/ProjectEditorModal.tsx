@@ -48,7 +48,7 @@ export function ProjectEditorModal({ project, trigger, onSuccess }: ProjectEdito
 
   useEffect(() => {
     if (open) {
-      fetch('http://localhost:5001/api/clients', {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/clients`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       })
       .then(res => res.ok ? res.json() : [])
@@ -60,7 +60,7 @@ export function ProjectEditorModal({ project, trigger, onSuccess }: ProjectEdito
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const url = isEditing ? `http://localhost:5001/api/projects/${project.id}` : 'http://localhost:5001/api/projects';
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${project.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/projects`;
       const method = isEditing ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,

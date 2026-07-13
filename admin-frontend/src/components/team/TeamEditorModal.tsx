@@ -48,7 +48,7 @@ export function TeamEditorModal({ member, trigger, onSuccess }: TeamEditorModalP
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const url = isEditing ? `http://localhost:5001/api/admin/users/${member.id}` : 'http://localhost:5001/api/admin/users/invite';
+      const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${member.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/invite`;
       const method = isEditing ? 'PUT' : 'POST';
       const res = await fetch(url, {
         method,

@@ -28,8 +28,8 @@ export default function WorkPage() {
     const fetchData = async () => {
       try {
         const [worksRes, catsRes] = await Promise.all([
-          fetch('http://localhost:5001/api/works'),
-          fetch('http://localhost:5001/api/work-categories')
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/works`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/work-categories`)
         ]);
         
         if (worksRes.ok) {
@@ -59,7 +59,7 @@ export default function WorkPage() {
   const getImageUrl = (url: string | null) => {
     if (!url) return defaultImage;
     if (url.startsWith('http')) return url;
-    return `http://localhost:5001${url}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
   };
 
   return (

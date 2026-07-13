@@ -19,7 +19,7 @@ export function ProjectStatsEditor({ project, onClose, onSuccess }: { project: a
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = await fetchWithAuth(`http://localhost:5001/api/projects/${project.id}`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${project.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

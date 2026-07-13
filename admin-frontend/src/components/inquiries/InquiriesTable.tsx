@@ -36,7 +36,7 @@ export function InquiriesTable() {
 
   const fetchInquiries = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/inquiries', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inquiries`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (response.ok) {
@@ -56,7 +56,7 @@ export function InquiriesTable() {
 
   const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/inquiries/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inquiries/${id}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

@@ -44,7 +44,7 @@ export function TaskEditorModal({
 
   useEffect(() => {
     if (open) {
-      fetchWithAuth('http://localhost:5001/api/admin/users/team')
+      fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/team`)
         .then(async res => {
           if (!res.ok) throw new Error('Failed to fetch team');
           return res.json();
@@ -58,7 +58,7 @@ export function TaskEditorModal({
     setLoading(true);
     try {
       const isEditing = !!task;
-      const endpoint = isEditing ? `http://localhost:5001/api/tasks/${task.id}` : `http://localhost:5001/api/tasks`;
+      const endpoint = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/tasks/${task.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/tasks`;
       const res = await fetchWithAuth(endpoint, {
         method: isEditing ? 'PATCH' : 'POST',
         headers: {

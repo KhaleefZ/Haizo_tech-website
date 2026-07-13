@@ -54,7 +54,7 @@ export default function VerifyCodePage() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5001/api/auth/verify-reset-code', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-reset-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code: fullCode }),

@@ -25,7 +25,7 @@ export default function SettingsPage() {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/admin/users/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/profile`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -42,7 +42,7 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/admin/users/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/profile`, {
         method: 'PATCH',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -71,7 +71,7 @@ export default function SettingsPage() {
     formData.append('image', file);
 
     try {
-      const res = await fetch('http://localhost:5001/api/upload', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
         method: 'POST',
         body: formData
       });
@@ -94,7 +94,7 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5001/api/admin/users/security', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/security`, {
         method: 'PATCH',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -121,7 +121,7 @@ export default function SettingsPage() {
     setPreferences(prev => ({ ...prev, [key]: newValue }));
     try {
       const token = localStorage.getItem('token');
-      await fetch('http://localhost:5001/api/admin/users/preferences', {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/preferences`, {
         method: 'PATCH',
         headers: { 
           'Authorization': `Bearer ${token}`,

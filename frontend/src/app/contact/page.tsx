@@ -70,7 +70,7 @@ export default function ContactPage() {
     
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://localhost:5001/api/inquiries', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inquiries`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

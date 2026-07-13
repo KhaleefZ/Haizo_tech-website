@@ -25,7 +25,7 @@ export function WorksTable() {
 
   const fetchWorks = async () => {
     try {
-      const response = await fetchWithAuth('http://localhost:5001/api/works');
+      const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/works`);
       if (response.ok) {
         const result = await response.json();
         setData(result);
@@ -44,7 +44,7 @@ export function WorksTable() {
   const handleDelete = async (id: string | number) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
     try {
-      const res = await fetchWithAuth(`http://localhost:5001/api/works/${id}`, {
+      const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/works/${id}`, {
         method: 'DELETE'
       });
       if (res.ok) {

@@ -17,7 +17,7 @@ type WorkItem = {
 
 async function getWork(id: string): Promise<WorkItem | null> {
   try {
-    const res = await fetch(`http://localhost:5001/api/works/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/works/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -48,7 +48,7 @@ export default async function WorkDetailsPage({
   const getImageUrl = (url: string | null) => {
     if (!url) return defaultImage;
     if (url.startsWith('http')) return url;
-    return `http://localhost:5001${url}`;
+    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
   };
 
   // Map category to contact query param

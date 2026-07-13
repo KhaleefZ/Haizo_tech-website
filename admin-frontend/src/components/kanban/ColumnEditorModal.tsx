@@ -37,8 +37,8 @@ export function ColumnEditorModal({ projectId, column, onSuccess, trigger }: Col
     setLoading(true);
     try {
       const url = isEditing 
-        ? `http://localhost:5001/api/projects/columns/${column.id}` 
-        : `http://localhost:5001/api/projects/${projectId}/columns`;
+        ? `${process.env.NEXT_PUBLIC_API_URL}/api/projects/columns/${column.id}` 
+        : `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}/columns`;
       const method = isEditing ? 'PUT' : 'POST';
       
       const res = await fetch(url, {
@@ -67,7 +67,7 @@ export function ColumnEditorModal({ projectId, column, onSuccess, trigger }: Col
     
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5001/api/projects/columns/${column.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/columns/${column.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });

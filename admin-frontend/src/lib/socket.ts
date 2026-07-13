@@ -15,7 +15,7 @@ export const getSocket = (): Socket | null => {
   }
   
   if (!socket) {
-    socket = io('http://localhost:5001', {
+    socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
       auth: {
         token
       }

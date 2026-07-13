@@ -5,11 +5,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/uploads/:path*',
-        destination: 'http://localhost:5001/uploads/:path*' // Proxy to Backend Uploads
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/uploads/:path*` // Proxy to Backend Uploads
       },
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5001/api/:path*'
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`
       }
     ];
   }
