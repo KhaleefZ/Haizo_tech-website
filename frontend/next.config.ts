@@ -19,14 +19,15 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*` // Proxy to Backend
+        destination: `${API_URL}/api/:path*` // Proxy to Backend
       },
       {
         source: '/uploads/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/uploads/:path*` // Proxy to Backend Uploads
+        destination: `${API_URL}/uploads/:path*` // Proxy to Backend Uploads
       }
     ];
   }
