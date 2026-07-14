@@ -65,7 +65,8 @@ if (!config.isProd) {
 }
 
 // ---------- Static uploads (TEMPORARY — remove once R2 is live) ----------
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// Dev fallback. In production Nginx serves this directly from disk.
+app.use('/uploads', express.static(config.uploadDir));
 
 // ---------- Health ----------
 app.get('/health', (_req, res) => res.json({ ok: true }));
