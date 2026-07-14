@@ -1,0 +1,115 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up SSH
+        env:
+          KEY: ${{ secrets.VPS_SSH_KEY }}
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          echo "REL=$(date +%Y-%m-%d-%H%M%S)" >> $GITHUB_ENV
+
+      # ---- Backend first: the frontends build against the live API ----
+      - name: Build backend
+        working-directory: backend
+        run: |
+          npm ci
+          npm run build
+          npm prune --omit=dev
+
+      - name: Ship backend
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          ssh deploy@$HOST "mkdir -p /srv/haizotech/releases/$REL/{frontend,admin,backend}"
+          rsync -az --delete \
+            backend/dist backend/node_modules backend/prisma backend/package.json \
+            deploy@$HOST:/srv/haizotech/releases/$REL/backend/
+
+      - name: Migrate and start API
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          ssh deploy@$HOST bash -s << EOF
+            set -euo pipefail
+            NEW=/srv/haizotech/releases/$REL
+            ln -sfn /srv/haizotech/shared/backend.env  "\$NEW/backend/.env"
+            ln -sfn /srv/haizotech/shared/frontend.env "\$NEW/frontend/.env"
+            cd "\$NEW/backend"
+            npx prisma migrate deploy
+            ln -sfn "\$NEW" /srv/haizotech/current
+            sudo systemctl restart haizo-api
+          EOF
+          echo "waiting for API..."
+          for i in {1..30}; do
+            if curl -sf https://api.haizotech.com/health > /dev/null; then
+              echo "API is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "API failed to come up"; exit 1
+
+      # ---- Now the frontends can safely build against the live API ----
+      - name: Build public site
+        working-directory: frontend
+        env:
+          NEXT_PUBLIC_API_URL: https://api.haizotech.com
+          NEXT_PUBLIC_BASE_URL: https://haizotech.com
+        run: |
+          npm ci
+          npm run build
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
+
+      - name: Build admin
+        working-directory: admin-frontend
+        env:
+          NEXT_PUBLIC_API_URL: https://api.haizotech.com
+        run: |
+          npm ci
+          npm run build
+          cp -r public .next/standalone/
+          cp -r .next/static .next/standalone/.next/
+
+      - name: Ship frontends
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          rsync -az --delete \
+            frontend/.next/standalone/ \
+            deploy@$HOST:/srv/haizotech/releases/$REL/frontend/
+
+          rsync -az --delete \
+            admin-frontend/.next/standalone/ \
+            deploy@$HOST:/srv/haizotech/releases/$REL/admin/
+
+      - name: Activate
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          ssh deploy@$HOST bash -s << EOF
+            set -euo pipefail
+            ln -sfn /srv/haizotech/shared/frontend.env /srv/haizotech/releases/$REL/frontend/.env
+            sudo systemctl restart haizo-web
+            sudo systemctl restart haizo-admin
+            cd /srv/haizotech/releases && ls -1t | tail -n +6 | xargs -r rm -rf
+            echo "deployed $REL"
+          EOF
