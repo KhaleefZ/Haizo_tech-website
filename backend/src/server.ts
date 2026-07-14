@@ -8,6 +8,6 @@ const server = http.createServer(app);
 // Initialize Socket.io
 initSockets(server);
 
-server.listen(config.port, () => {
-  console.log(`Server is running on port ${config.port}`);
+server.listen(config.port, '127.0.0.1', () => {
+  console.log(`Server is running on 127.0.0.1:${config.port}`);
 });
