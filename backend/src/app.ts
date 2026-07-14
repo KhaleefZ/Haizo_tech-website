@@ -23,47 +23,65 @@ import path from 'path';
 
 const app = express();
 
-// Middlewares
+// ---------- Middleware ----------
+app.set('trust proxy', 1); // sits behind Nginx in production
+
 app.use(helmet({
-  crossOriginResourcePolicy: false // Allows loading local uploads in browser
+  crossOriginResourcePolicy: false, // keep until R2 replaces local uploads
 }));
-app.use(cors({ origin: config.corsOrigins }));
-app.use(express.json());
+app.use(cors({ origin: config.corsOrigins, credentials: false }));
+app.use(express.json({ limit: '1mb' }));
+
+// ---------- Rate limiting ----------
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Try again in 15 minutes.' },
+});
 
 const inquiryLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Limit each IP to 10 requests per window
-  message: { error: 'Too many contact requests from this IP, please try again later.' }
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many contact requests from this IP, please try again later.' },
 });
 
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/forgot-password', authLimiter);
 app.use('/api/inquiries', inquiryLimiter);
 
-// Logging middleware
-app.use((req, res, next) => {
-  const start = Date.now();
-  console.log(`[=>] ${req.method} ${req.url}`);
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(`[<=] ${req.method} ${req.url} ${res.statusCode} ${duration}ms`);
+// ---------- Logging (dev only) ----------
+if (!config.isProd) {
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      console.log(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - start}ms`);
+    });
+    next();
   });
-  next();
-});
+}
 
+// ---------- Static uploads (TEMPORARY — remove once R2 is live) ----------
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
-// API Routes
+// ---------- Health ----------
+app.get('/health', (_req, res) => res.json({ ok: true }));
+
+// ---------- API Routes ----------
 app.use('/api/auth', authRoutes);
 app.use('/api/admin/users', userRoutes);
 app.use('/api/works', workRoutes);
 app.use('/api/work-categories', workCategoryRoutes);
-app.use('/api/admin/works', workRoutes); // Note: Admin overrides logic for creating/updating is handled in work.routes by middleware
+app.use('/api/admin/works', workRoutes); // TODO: remove alias once admin frontend is updated
 app.use('/api/inquiries', inquiryRoutes);
-app.use('/api/admin/inquiries', inquiryRoutes);
-app.use('/api/admin/projects', projectRoutes);
-app.use('/api/admin/tasks', taskRoutes);
+app.use('/api/admin/inquiries', inquiryRoutes); // TODO: remove alias
+app.use('/api/admin/projects', projectRoutes); // TODO: remove alias
+app.use('/api/admin/tasks', taskRoutes);       // TODO: remove alias
 app.use('/api/blogs', blogRoutes);
 app.use('/api/clients', clientRoutes);
-// also alias for API consistency
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -72,10 +90,13 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/announcements', announcementRoutes);
 
-// Global Error Handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+// ---------- Global Error Handler ----------
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(err);
+  if (err?.message === 'Unsupported file type') {
+    return res.status(400).json({ error: err.message });
+  }
+  res.status(500).json({ error: 'Something went wrong' });
 });
 
 export default app;
