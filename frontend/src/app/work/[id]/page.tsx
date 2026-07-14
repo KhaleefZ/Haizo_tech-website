@@ -17,7 +17,9 @@ type WorkItem = {
 
 async function getWork(id: string): Promise<WorkItem | null> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/works/${id}`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/works/${id}`, {
+      next: { revalidate: 600, tags: ['works'] },
+    });
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {

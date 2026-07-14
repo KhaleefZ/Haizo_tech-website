@@ -16,8 +16,8 @@ type Blog = {
 
 async function getBlogs(): Promise<Blog[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs`, { 
-      cache: 'no-store' // Fetch dynamically
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs`, {
+      next: { revalidate: 600, tags: ['blogs'] },
     });
     if (!res.ok) throw new Error('Failed to fetch');
     const allBlogs: Blog[] = await res.json();
