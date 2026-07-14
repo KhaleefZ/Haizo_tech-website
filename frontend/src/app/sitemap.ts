@@ -49,6 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [...staticRoutes, ...workRoutes, ...blogRoutes];
   } catch (error) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(`Sitemap generation failed — API unreachable at ${API_URL}`);
+    }
     console.error('Error generating sitemap:', error);
     return staticRoutes;
   }
