@@ -24,6 +24,45 @@ async function getBlog(id: string): Promise<Blog | null> {
   }
 }
 
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getBlog(slug);
+
+  if (!post) {
+    return { title: "Blog Post Not Found | HaizoTech" };
+  }
+
+  const defaultImage = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop";
+  const getImageUrl = (url: string | null) => {
+    if (!url) return defaultImage;
+    if (url.startsWith('http')) return url;
+    return url;
+  };
+
+  return {
+    title: `${post.title} | HaizoTech Blog`,
+    description: post.content.slice(0, 160) + '...',
+    alternates: {
+      canonical: `https://haizotech.com/blog/${slug}`,
+    },
+    openGraph: {
+      title: `${post.title} | HaizoTech`,
+      description: post.content.slice(0, 160) + '...',
+      type: "article",
+      publishedTime: post.createdAt,
+      images: [{ url: getImageUrl(post.imageUrl) }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.content.slice(0, 160) + '...',
+      images: [getImageUrl(post.imageUrl)],
+    }
+  };
+}
+
 export default async function BlogPost({
   params,
 }: {
@@ -41,18 +80,49 @@ export default async function BlogPost({
     );
   }
 
-  const defaultImage = "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2940&auto=format&fit=crop";
+  const defaultImage = "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop";
+  const coverImage = post.imageUrl ? (post.imageUrl.startsWith('http') ? post.imageUrl : post.imageUrl) : defaultImage;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://haizotech.com/blog/${slug}`
+    },
+    "headline": post.title,
+    "image": [coverImage],
+    "datePublished": post.createdAt,
+    "dateModified": post.createdAt,
+    "author": {
+      "@type": "Organization",
+      "name": "HaizoTech Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "HaizoTech",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://haizotech.com/logo.jpg"
+      }
+    }
+  };
+
   const getImageUrl = (url: string | null) => {
-    if (!url) return defaultImage;
+    if (!url) return "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2940&auto=format&fit=crop";
     if (url.startsWith('http')) return url;
     return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
   };
-  const coverImage = getImageUrl(post.imageUrl);
   const category = post.tags && post.tags.length > 0 ? post.tags[0] : "Technology Insight";
   const dateStr = new Date(post.createdAt).toLocaleDateString();
 
   return (
-    <div className="container mx-auto px-6 py-12">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="container mx-auto px-6 py-12 md:py-20 relative">
       <AnimatedSection className="mb-8 max-w-4xl mx-auto">
         <Link href="/blog" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
           <ArrowLeft size={18} className="transform group-hover:-translate-x-1 transition-transform" /> Back to Blog
@@ -113,5 +183,7 @@ export default async function BlogPost({
         </AnimatedSection>
       </article>
     </div>
+    </>
   );
 }
+

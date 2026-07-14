@@ -74,7 +74,6 @@ export default async function BlogPage() {
                    alt={featuredPost.title} 
                    fill
                    priority
-                   unoptimized
                    sizes="(max-width: 768px) 100vw, 50vw"
                    className="absolute inset-0 w-full h-full object-cover" 
                  />
@@ -117,7 +116,6 @@ export default async function BlogPage() {
                         src={getImageUrl(post.imageUrl)} 
                         alt={post.title} 
                         fill
-                        unoptimized
                         sizes="(max-width: 768px) 100vw, 50vw"
                         className="w-full h-full object-cover" 
                       />

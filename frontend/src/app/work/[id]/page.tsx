@@ -26,6 +26,46 @@ async function getWork(id: string): Promise<WorkItem | null> {
   }
 }
 
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const project = await getWork(id);
+
+  if (!project) {
+    return { title: "Project Not Found | HaizoTech" };
+  }
+
+  const defaultImage = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop";
+  const getImageUrl = (url: string | null) => {
+    if (!url) return defaultImage;
+    if (url.startsWith('http')) return url;
+    return url;
+  };
+  
+  const coverImage = project.imageUrls && project.imageUrls.length > 0 ? getImageUrl(project.imageUrls[0]) : defaultImage;
+
+  return {
+    title: `${project.title} - ${project.category} | HaizoTech Portfolio`,
+    description: project.description.slice(0, 160) + '...',
+    alternates: {
+      canonical: `https://haizotech.com/work/${id}`,
+    },
+    openGraph: {
+      title: `${project.title} | HaizoTech`,
+      description: project.description.slice(0, 160) + '...',
+      type: "article",
+      images: [{ url: coverImage }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.description.slice(0, 160) + '...',
+      images: [coverImage],
+    }
+  };
+}
+
 export default async function WorkDetailsPage({
   params,
 }: {
@@ -43,7 +83,32 @@ export default async function WorkDetailsPage({
     );
   }
 
-  const defaultImage = "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2940&auto=format&fit=crop";
+  const defaultImage = "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop";
+  const coverImage = project.imageUrls && project.imageUrls.length > 0 ? (project.imageUrls[0].startsWith('http') ? project.imageUrls[0] : project.imageUrls[0]) : defaultImage;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://haizotech.com/work/${id}`
+    },
+    "headline": project.title,
+    "image": [coverImage],
+    "datePublished": project.createdAt,
+    "author": {
+      "@type": "Organization",
+      "name": "HaizoTech Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "HaizoTech",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://haizotech.com/logo.jpg"
+      }
+    }
+  };
 
   const getImageUrl = (url: string | null) => {
     if (!url) return defaultImage;
@@ -65,7 +130,12 @@ export default async function WorkDetailsPage({
   const contactLink = serviceParam ? `/contact?service=${serviceParam}` : "/contact";
 
   return (
-    <div className="container mx-auto px-6 py-12">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div className="container mx-auto px-6 py-12 md:py-20">
       <AnimatedSection className="mb-8 max-w-5xl mx-auto">
         <Link href="/work" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
           <ArrowLeft size={18} className="transform group-hover:-translate-x-1 transition-transform" /> Back to Portfolio
@@ -95,7 +165,6 @@ export default async function WorkDetailsPage({
                   src={getImageUrl(project.imageUrls[0])} 
                   alt={`${project.title} - Featured`}
                   fill
-                  unoptimized
                   sizes="(max-width: 768px) 100vw, 66vw"
                   className="object-cover"
                   priority
@@ -109,7 +178,6 @@ export default async function WorkDetailsPage({
                       src={getImageUrl(url)} 
                       alt={`${project.title} - Detail ${idx + 1}`}
                       fill
-                      unoptimized
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
                     />
@@ -186,6 +254,7 @@ export default async function WorkDetailsPage({
           </div>
         </AnimatedSection>
       </article>
-    </div>
+      </div>
+    </>
   );
 }

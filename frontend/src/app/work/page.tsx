@@ -120,7 +120,7 @@ export default function WorkPage() {
                     src={getImageUrl(project.imageUrls?.[0] || null)} 
                     alt={project.title} 
                     fill
-                    unoptimized
+                    priority={idx < 3}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="w-full h-full object-cover" 
                   />
