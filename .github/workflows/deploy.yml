@@ -24,7 +24,19 @@ jobs:
           mkdir -p ~/.ssh
           echo "$KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+
+          cat > ~/.ssh/config << EOF
+          Host $HOST
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            BatchMode yes
+            ConnectTimeout 15
+          EOF
+          chmod 600 ~/.ssh/config
+
+          # Prove the connection here, not three steps later.
+          ssh deploy@$HOST 'echo SSH OK'
+
           echo "REL=$(date +%Y-%m-%d-%H%M%S)" >> $GITHUB_ENV
 
       # ---- Backend first: the frontends build against the live API ----
@@ -58,14 +70,18 @@ jobs:
             ln -sfn "\$NEW" /srv/haizotech/current
             sudo systemctl restart haizo-api
           EOF
-          echo "waiting for API..."
-          for i in {1..30}; do
+
+          echo "Waiting for API..."
+          for i in $(seq 1 30); do
             if curl -sf https://api.haizotech.com/health > /dev/null; then
-              echo "API is up"; exit 0
+              echo "API is up"
+              exit 0
             fi
             sleep 2
           done
-          echo "API failed to come up"; exit 1
+          echo "API failed to come up"
+          ssh deploy@$HOST 'journalctl -u haizo-api -n 40 --no-pager' || true
+          exit 1
 
       # ---- Now the frontends can safely build against the live API ----
       - name: Build public site
