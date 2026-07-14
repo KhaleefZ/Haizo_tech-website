@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx tsx watch src/server.ts",
-    "start": "npx tsx src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/server.js",
+    "migrate:deploy": "prisma migrate deploy",
+    "seed": "tsx prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +17,6 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^5.22.0",
-    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -29,7 +30,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -37,11 +37,9 @@
     "@types/multer": "^2.2.0",
     "@types/node": "^26.1.1",
     "@types/pg": "^8.20.0",
-    "nodemon": "^3.1.14",
     "prisma": "^5.22.0",
-    "ts-node": "^10.9.2",
     "tsx": "^4.23.0",
-    "typescript": "^7.0.2"
+    "typescript": "^5.9.3"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
