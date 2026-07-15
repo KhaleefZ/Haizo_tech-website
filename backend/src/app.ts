@@ -33,6 +33,8 @@ app.use(cors({ origin: config.corsOrigins, credentials: false }));
 app.use(express.json({ limit: '1mb' }));
 
 // ---------- Rate limiting ----------
+
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 8,
@@ -51,11 +53,11 @@ const inquiryLimiter = rateLimit({
 
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/forgot-password', authLimiter);
-app.use('/api/inquiries', inquiryLimiter);
+app.post('/api/inquiries', inquiryLimiter);
 
 // ---------- Logging (dev only) ----------
 if (!config.isProd) {
-  app.use((req, res, next) => {
+  app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
     const start = Date.now();
     res.on('finish', () => {
       console.log(`${req.method} ${req.url} ${res.statusCode} ${Date.now() - start}ms`);
@@ -69,7 +71,7 @@ if (!config.isProd) {
 app.use('/uploads', express.static(config.uploadDir));
 
 // ---------- Health ----------
-app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get('/health', (_req: express.Request, res: express.Response) => res.json({ ok: true }));
 
 // ---------- API Routes ----------
 app.use('/api/auth', authRoutes);

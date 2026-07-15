@@ -30,10 +30,12 @@ export default function WorkGrid({
   const defaultImage =
     "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop";
 
-  const getImageUrl = (url: string | undefined) => {
+  const getImageUrl = (url: string | undefined | null) => {
     if (!url) return defaultImage;
-    if (url.startsWith("http")) return url;
-    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+    if (url.includes('/uploads/')) {
+      return url.substring(url.indexOf('/uploads/'));
+    }
+    return url;
   };
 
   const tabs = ["All", ...categories.sort((a, b) => a.order - b.order).map((c) => c.name)];

@@ -95,9 +95,10 @@ export function WorkEditorModal({ work, trigger, onSuccess }: WorkEditorModalPro
   const handleRemoveImage = async (imageUrl: string, index: number) => {
     try {
       if (imageUrl.startsWith('/uploads/')) {
-        const filename = imageUrl.split('/').pop();
-        await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${filename}`, {
-          method: 'DELETE'
+        await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl })
         });
       }
       

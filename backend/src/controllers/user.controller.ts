@@ -8,7 +8,7 @@ import crypto from 'crypto';
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, name: true, email: true, role: true, createdAt: true }
+      select: { id: true, name: true, email: true, role: true, createdAt: true, avatarUrl: true }
     });
     res.json(users);
   } catch (error) {
@@ -29,7 +29,7 @@ export const getTeam = async (req: Request, res: Response) => {
 
 export const inviteUser = async (req: Request, res: Response) => {
   try {
-    const { name, email, role, bio, password } = req.body;
+    const { name, email, role, bio, password, avatarUrl } = req.body;
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return res.status(400).json({ error: 'User already exists' });
@@ -45,8 +45,8 @@ export const inviteUser = async (req: Request, res: Response) => {
       : await hashPassword(crypto.randomBytes(16).toString('hex'));
 
     const user = await prisma.user.create({
-      data: { name, email, role, bio, password: finalPassword, inviteToken, inviteTokenExpires },
-      select: { id: true, name: true, email: true, role: true, bio: true, inviteToken: true }
+      data: { name, email, role, bio, password: finalPassword, inviteToken, inviteTokenExpires, avatarUrl },
+      select: { id: true, name: true, email: true, role: true, bio: true, inviteToken: true, avatarUrl: true }
     });
     
     if (!password) {
@@ -63,12 +63,12 @@ export const inviteUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const { name, role, bio } = req.body;
+    const { name, role, bio, avatarUrl } = req.body;
     
     const user = await prisma.user.update({
       where: { id },
-      data: { name, role, bio },
-      select: { id: true, name: true, email: true, role: true, bio: true }
+      data: { name, role, bio, avatarUrl },
+      select: { id: true, name: true, email: true, role: true, bio: true, avatarUrl: true }
     });
     res.json(user);
   } catch (error) {

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AnimatedSection } from '@/components/ui/AnimatedSection';
 import { useAppStore } from '@/store/useAppStore';
-import { ShieldAlert, Loader2 } from 'lucide-react';
+import { ShieldAlert, Loader2, Eye, EyeOff } from 'lucide-react';
 import Cookies from 'js-cookie';
 
 const loginSchema = z.object({
@@ -23,6 +23,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { setRole } = useAppStore();
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -109,13 +110,22 @@ export default function LoginPage() {
                 </label>
                 <a href="/forgot-password" className="text-xs text-primary hover:underline">Forgot password?</a>
               </div>
-              <Input
-                id="password"
-                type="password"
-                className="bg-white/5 border-white/10"
-                disabled={isSubmitting}
-                {...register('password')}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  className="bg-white/5 border-white/10 pr-10"
+                  disabled={isSubmitting}
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
             </div>
 

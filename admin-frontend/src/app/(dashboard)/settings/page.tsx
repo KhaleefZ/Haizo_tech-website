@@ -5,7 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AnimatedSection } from '@/components/ui/AnimatedSection';
-import { Camera, Loader2 } from 'lucide-react';
+import { Camera, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 export default function SettingsPage() {
@@ -17,6 +17,8 @@ export default function SettingsPage() {
   const [preferences, setPreferences] = useState({ notificationsEnabled: true, maintenanceMode: false });
   const [loading, setLoading] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -73,6 +75,7 @@ export default function SettingsPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: formData
       });
       if (res.ok) {
@@ -184,11 +187,43 @@ export default function SettingsPage() {
           <div className="flex flex-col gap-4 max-w-md">
             <div className="grid gap-2">
               <label htmlFor="current_password" className="text-sm font-medium">Current Password</label>
-              <Input id="current_password" type="password" value={security.currentPassword} onChange={e => setSecurity({...security, currentPassword: e.target.value})} placeholder="••••••••" className="bg-white/5 border-white/10" />
+              <div className="relative">
+                <Input 
+                  id="current_password" 
+                  type={showCurrentPassword ? "text" : "password"} 
+                  value={security.currentPassword} 
+                  onChange={e => setSecurity({...security, currentPassword: e.target.value})} 
+                  placeholder="••••••••" 
+                  className="bg-white/5 border-white/10 pr-10" 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <div className="grid gap-2">
               <label htmlFor="new_password" className="text-sm font-medium">New Password</label>
-              <Input id="new_password" type="password" value={security.newPassword} onChange={e => setSecurity({...security, newPassword: e.target.value})} placeholder="••••••••" className="bg-white/5 border-white/10" />
+              <div className="relative">
+                <Input 
+                  id="new_password" 
+                  type={showNewPassword ? "text" : "password"} 
+                  value={security.newPassword} 
+                  onChange={e => setSecurity({...security, newPassword: e.target.value})} 
+                  placeholder="••••••••" 
+                  className="bg-white/5 border-white/10 pr-10" 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <Button className="w-fit mt-2" disabled={loading} onClick={handleUpdateSecurity}>Change Password</Button>
           </div>

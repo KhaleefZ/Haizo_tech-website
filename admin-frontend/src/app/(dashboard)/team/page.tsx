@@ -65,6 +65,9 @@ export default function TeamPage() {
             <div key={member.id} className="glass-card p-6 flex flex-col gap-4">
               <div className="flex items-start justify-between">
                 <Avatar className="h-12 w-12 border-2 border-primary/20">
+                  {member.avatarUrl && (
+                    <AvatarImage src={member.avatarUrl.startsWith('http') ? member.avatarUrl : `${process.env.NEXT_PUBLIC_API_URL}${member.avatarUrl}`} alt={member.name} className="object-cover" />
+                  )}
                   <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex gap-2">

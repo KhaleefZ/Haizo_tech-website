@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -28,6 +29,8 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
     currentPassword: '',
     newPassword: '',
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -110,10 +113,13 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
                     onClick={async () => {
                       try {
                         if (formData.avatarUrl.startsWith('/uploads/')) {
-                          const filename = formData.avatarUrl.split('/').pop();
-                          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${filename}`, {
+                          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
                             method: 'DELETE',
-                            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                            headers: { 
+                              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                              'Content-Type': 'application/json' 
+                            },
+                            body: JSON.stringify({ imageUrl: formData.avatarUrl })
                           });
                         }
                         setFormData(p => ({...p, avatarUrl: ''}));
@@ -140,6 +146,7 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
                     try {
                       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
                         method: 'POST',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                         body: formDataObj,
                       });
                       if (res.ok) {
@@ -187,21 +194,39 @@ export function ProfileSettingsModal({ open, onOpenChange }: ProfileSettingsModa
             <p className="text-sm font-medium text-muted-foreground">Change Password (Optional)</p>
             <div className="grid gap-2">
               <label className="text-xs font-medium">Current Password</label>
-              <Input 
-                type="password"
-                value={formData.currentPassword} 
-                onChange={(e) => setFormData(p => ({...p, currentPassword: e.target.value}))} 
-                className="bg-white/5 border-white/10" 
-              />
+              <div className="relative">
+                <Input 
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={formData.currentPassword} 
+                  onChange={(e) => setFormData(p => ({...p, currentPassword: e.target.value}))} 
+                  className="bg-white/5 border-white/10 pr-10" 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
             <div className="grid gap-2">
               <label className="text-xs font-medium">New Password</label>
-              <Input 
-                type="password"
-                value={formData.newPassword} 
-                onChange={(e) => setFormData(p => ({...p, newPassword: e.target.value}))} 
-                className="bg-white/5 border-white/10" 
-              />
+              <div className="relative">
+                <Input 
+                  type={showNewPassword ? "text" : "password"}
+                  value={formData.newPassword} 
+                  onChange={(e) => setFormData(p => ({...p, newPassword: e.target.value}))} 
+                  className="bg-white/5 border-white/10 pr-10" 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           </div>
         </div>

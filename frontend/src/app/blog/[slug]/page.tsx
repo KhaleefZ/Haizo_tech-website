@@ -20,8 +20,10 @@ const DEFAULT_IMAGE =
 
 function resolveImageUrl(url: string | null): string {
   if (!url) return DEFAULT_IMAGE;
-  if (url.startsWith("http")) return url;
-  return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+  if (url.includes('/uploads/')) {
+    return url.substring(url.indexOf('/uploads/'));
+  }
+  return url;
 }
 
 async function getBlog(id: string): Promise<Blog | null> {

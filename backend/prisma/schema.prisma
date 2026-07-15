@@ -7,38 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  SUPER_ADMIN
-  MANAGER
-  DEV
-}
-
-enum InquiryStatus {
-  NEW
-  READ
-  REPLIED
-}
-
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
+  id                   String         @id @default(uuid())
+  email                String         @unique
+  password             String
   name                 String
-  role                 Role     @default(DEV)
+  role                 Role           @default(DEV)
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
   bio                  String?
-  avatarUrl            String?
-  notificationsEnabled Boolean  @default(true)
-  maintenanceMode      Boolean  @default(false)
-  inviteToken          String?  @unique
+  maintenanceMode      Boolean        @default(false)
+  notificationsEnabled Boolean        @default(true)
+  inviteToken          String?        @unique
   inviteTokenExpires   DateTime?
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-  
-  // Relations
-  tasks     Task[]   @relation("TaskAssignee")
-  blogs     Blog[]   @relation("BlogAuthor")
-  notifications Notification[] @relation("UserNotifications")
-  announcements Announcement[] @relation("AnnouncementAuthor")
+  avatarUrl            String?
+  announcements        Announcement[] @relation("AnnouncementAuthor")
+  blogs                Blog[]         @relation("BlogAuthor")
+  notifications        Notification[] @relation("UserNotifications")
+  tasks                Task[]         @relation("TaskAssignee")
 }
 
 model Work {
@@ -47,10 +33,10 @@ model Work {
   category    String
   description String
   imageUrls   String[]
-  liveUrl     String?
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  liveUrl     String?
 
   @@index([published])
 }
@@ -64,45 +50,40 @@ model WorkCategory {
 }
 
 model Inquiry {
-  id            String        @id @default(uuid())
-  name          String
-  email         String
-  phone         String?
-  service       String?
-  message       String
-  status        InquiryStatus @default(NEW)
-  submissionDate DateTime     @default(now())
+  id             String        @id @default(uuid())
+  name           String
+  email          String
+  message        String
+  status         InquiryStatus @default(NEW)
+  submissionDate DateTime      @default(now())
+  phone          String?
+  service        String?
 
   @@index([status])
 }
 
 model Project {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
-  
-  // Stats
-  status      String   @default("Planning")
-  progress    Int      @default(0)
-  budget      String?
-  startDate   DateTime?
-  endDate     DateTime?
-  
   clientId    String?
-  client      Client?  @relation(fields: [clientId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  budget      String?
+  endDate     DateTime?
+  progress    Int       @default(0)
+  startDate   DateTime?
+  status      String    @default("Planning")
   columns     Column[]
+  client      Client?   @relation(fields: [clientId], references: [id])
 }
 
 model Column {
-  id        String   @id @default(uuid())
+  id        String  @id @default(uuid())
   name      String
   order     Int
   projectId String
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks     Task[]
 }
 
@@ -110,31 +91,28 @@ model Task {
   id          String    @id @default(uuid())
   title       String
   description String?
-  priority    String    @default("Low")
-  startDate   DateTime?
   dueDate     DateTime?
   tags        String[]
   order       Int
   columnId    String
-  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  
   assigneeId  String?
-  assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
-  
-  isCompleted Boolean   @default(false)
-  delayReason String?
-
-  subtasks    Subtask[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  delayReason String?
+  isCompleted Boolean   @default(false)
+  priority    String    @default("Low")
+  startDate   DateTime?
+  subtasks    Subtask[]
+  assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade)
 }
 
 model Subtask {
-  id        String   @id @default(uuid())
-  title     String
-  isDone    Boolean  @default(false)
-  taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id     String  @id @default(uuid())
+  title  String
+  isDone Boolean @default(false)
+  taskId String
+  task   Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 model Client {
@@ -142,22 +120,21 @@ model Client {
   organization String
   contactName  String
   email        String?
-  projects     Project[]
   createdAt    DateTime  @default(now())
+  projects     Project[]
 }
 
-
 model Blog {
-  id          String   @id @default(uuid())
-  title       String
-  content     String
-  authorId    String
-  author      User     @relation("BlogAuthor", fields: [authorId], references: [id])
-  tags        String[]
-  imageUrl    String?
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  authorId  String
+  tags      String[]
+  imageUrl  String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation("BlogAuthor", fields: [authorId], references: [id])
 
   @@index([published])
 }
@@ -165,12 +142,12 @@ model Blog {
 model Notification {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
   type      String
   title     String
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Announcement {
@@ -179,9 +156,21 @@ model Announcement {
   content   String
   audience  String   @default("ALL")
   authorId  String
-  author    User     @relation("AnnouncementAuthor", fields: [authorId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  author    User     @relation("AnnouncementAuthor", fields: [authorId], references: [id])
 
   @@index([audience])
+}
+
+enum Role {
+  SUPER_ADMIN
+  MANAGER
+  DEV
+}
+
+enum InquiryStatus {
+  NEW
+  READ
+  REPLIED
 }

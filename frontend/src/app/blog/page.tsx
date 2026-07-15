@@ -48,8 +48,10 @@ export default async function BlogPage() {
 
   const getImageUrl = (url: string | null) => {
     if (!url) return defaultImage;
-    if (url.startsWith('http')) return url;
-    return `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+    if (url.includes('/uploads/')) {
+      return url.substring(url.indexOf('/uploads/'));
+    }
+    return url;
   };
 
   return (

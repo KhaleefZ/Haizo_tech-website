@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Edit2 } from 'lucide-react';
+import { Plus, Edit2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,6 +21,7 @@ export interface TeamMemberItem {
   email: string;
   role: string;
   bio?: string;
+  avatarUrl?: string;
 }
 
 interface TeamEditorModalProps {
@@ -39,13 +40,23 @@ export function TeamEditorModal({ member, trigger, onSuccess }: TeamEditorModalP
     email: member?.email || '',
     role: member?.role || 'DEV',
     bio: member?.bio || '',
+    avatarUrl: member?.avatarUrl || '',
     password: '',
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const isDev = userRole === 'DEV';
   const isEditing = !!member;
 
   const handleSubmit = async () => {
+    // Email Validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert('Please enter a valid email address (e.g., user@domain.com)');
+      return;
+    }
+
     setLoading(true);
     try {
       const url = isEditing ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${member.id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/invite`;
@@ -89,7 +100,8 @@ export function TeamEditorModal({ member, trigger, onSuccess }: TeamEditorModalP
             {isEditing ? 'Modify details.' : 'Add a new member to your team.'}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
+
           <div className="grid grid-cols-4 items-center gap-4">
             <label className="text-right text-sm font-medium">Name</label>
             <Input value={formData.name} onChange={(e) => setFormData(p => ({...p, name: e.target.value}))} className="col-span-3 bg-white/5 border-white/10" disabled={isDev || loading} />
@@ -114,7 +126,16 @@ export function TeamEditorModal({ member, trigger, onSuccess }: TeamEditorModalP
           {!isEditing && (
             <div className="grid grid-cols-4 items-center gap-4">
               <label className="text-right text-sm font-medium">Password</label>
-              <Input type="password" placeholder="Leave empty to send invite link" value={formData.password} onChange={(e) => setFormData(p => ({...p, password: e.target.value}))} className="col-span-3 bg-white/5 border-white/10" disabled={isDev || loading} />
+              <div className="col-span-3 relative">
+                <Input type={showPassword ? "text" : "password"} placeholder="Leave empty to send invite link" value={formData.password} onChange={(e) => setFormData(p => ({...p, password: e.target.value}))} className="bg-white/5 border-white/10 pr-10" disabled={isDev || loading} />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
           )}
           <div className="grid grid-cols-4 items-center gap-4">

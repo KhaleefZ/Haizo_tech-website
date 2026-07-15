@@ -64,6 +64,7 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
         method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         body: formDataObj,
       });
       if (res.ok) {
@@ -83,12 +84,13 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
   const handleRemoveImage = async (imageUrl: string) => {
     try {
       if (imageUrl.startsWith('/uploads/')) {
-        const filename = imageUrl.split('/').pop();
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/${filename}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ imageUrl })
         });
       }
       setFormData({ ...formData, imageUrl: '' });
@@ -250,7 +252,7 @@ export function BlogEditorModal({ blog, trigger, onSuccess }: BlogEditorModalPro
           <TabsContent value="preview" className="py-4">
             <div className="glass-panel p-6 border-white/10 bg-background/50 rounded-xl max-h-[60vh] overflow-y-auto">
               {formData.imageUrl && (
-                <img src={formData.imageUrl} alt={formData.title} className="w-full h-64 object-cover rounded-xl mb-6" />
+                <img src={formData.imageUrl.startsWith('http') ? formData.imageUrl : `${process.env.NEXT_PUBLIC_API_URL}${formData.imageUrl}`} alt={formData.title} className="w-full h-64 object-cover rounded-xl mb-6" />
               )}
               <div className="flex items-center gap-2 mb-4">
                 <span className="px-3 py-1 bg-primary/20 text-primary text-xs font-semibold rounded-full">
