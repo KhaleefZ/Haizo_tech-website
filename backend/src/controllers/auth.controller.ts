@@ -4,6 +4,8 @@ import { hashPassword, comparePassword } from '../utils/password.utils';
 import { generateToken } from '../utils/jwt.utils';
 import crypto from 'crypto';
 import { getIo } from '../sockets/index';
+import { config } from '../config/env';
+import { sendMail, resetCodeEmail } from '../utils/mailer';
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -79,14 +81,14 @@ export const forgotPassword = async (req: Request, res: Response) => {
     // Find the super admin to notify
     const superAdmin = await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } });
 
-    // In production, send an email. For now, emit via socket to SUPER_ADMIN.
-    console.log('\n=========================================');
-    console.log('[PASSWORD RESET] Code requested');
-    console.log(`User: ${user.name} (${user.email})`);
-    console.log(`Reset Code: ${resetCode}`);
-    if (superAdmin) console.log(`Notify Super Admin: ${superAdmin.email}`);
-    console.log(`Expires at: ${resetCodeExpires.toLocaleTimeString()}`);
-    console.log('=========================================\n');
+    // Email the reset code directly to the requesting user.
+    const mail = resetCodeEmail(user.name, resetCode);
+    await sendMail({ to: user.email, subject: mail.subject, text: mail.text, html: mail.html });
+
+    // Never log the raw code in production. Dev-only convenience below.
+    if (!config.isProd) {
+      console.log('\n[PASSWORD RESET]', user.email, 'code:', resetCode, 'expires', resetCodeExpires.toLocaleTimeString());
+    }
 
     // Emit a real-time notification to all connected SUPER_ADMINs
     try {

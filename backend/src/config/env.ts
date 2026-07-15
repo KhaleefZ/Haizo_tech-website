@@ -20,6 +20,16 @@ const schema = z.object({
 
   REVALIDATE_URL: z.string().optional(),
   REVALIDATE_SECRET: z.string().optional(),
+
+  // ---- Email (SMTP) ----
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().default(587),
+  SMTP_SECURE: z.enum(['true', 'false']).default('false').transform((v) => v === 'true'),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  MAIL_FROM: z.string().optional(),
+  ADMIN_BASE_URL: z.string().optional(),
+
 });
 
 const parsed = schema.safeParse(process.env);
@@ -43,4 +53,10 @@ export const config = {
     url: e.REVALIDATE_URL,
     secret: e.REVALIDATE_SECRET,
   },
+  smtp: {
+    host: e.SMTP_HOST, port: e.SMTP_PORT, secure: e.SMTP_SECURE,
+    user: e.SMTP_USER, pass: e.SMTP_PASS,
+  },
+  mailFrom: e.MAIL_FROM || 'HaizoTech <no-reply@haizotech.com>',
+  adminBaseUrl: (e.ADMIN_BASE_URL || e.CORS_ORIGINS.split(',')[0].trim()).replace(/\/$/, ''),
 };

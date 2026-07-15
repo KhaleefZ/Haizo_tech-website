@@ -4,6 +4,8 @@ import { hashPassword } from '../utils/password.utils';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../middlewares/auth.middleware';
 import crypto from 'crypto';
+import { config } from '../config/env';
+import { sendMail, inviteEmail } from '../utils/mailer';
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
@@ -34,27 +36,28 @@ export const inviteUser = async (req: Request, res: Response) => {
     if (existing) {
       return res.status(400).json({ error: 'User already exists' });
     }
-    
+
     // Generate an invite token
     const inviteToken = password ? null : crypto.randomBytes(32).toString('hex');
     const inviteTokenExpires = password ? null : new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-    
+
     // Use the provided password, or a placeholder if none is provided
-    const finalPassword = password 
-      ? await hashPassword(password) 
+    const finalPassword = password
+      ? await hashPassword(password)
       : await hashPassword(crypto.randomBytes(16).toString('hex'));
 
     const user = await prisma.user.create({
       data: { name, email, role, bio, password: finalPassword, inviteToken, inviteTokenExpires, avatarUrl },
       select: { id: true, name: true, email: true, role: true, bio: true, inviteToken: true, avatarUrl: true }
     });
-    
-    if (!password) {
-      // In a real app, send email here. For now, we return it to simulate sending it.
-      console.log(`[EMAIL MOCK] Send invite to ${email}: http://localhost:3000/invite/${inviteToken}`);
-    }
 
-    res.status(201).json(user);
+    if (!password && inviteToken) {
+      const inviteUrl = `${config.adminBaseUrl}/invite/${inviteToken}`;
+      const { subject, text, html } = inviteEmail(name, inviteUrl);
+      const result = await sendMail({ to: email, subject, text, html });
+      // Return the URL so the admin can copy it manually if email delivery failed.
+      return res.status(201).json({ ...user, inviteUrl, emailSent: result.sent, emailError: result.reason });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Failed to invite user' });
   }
@@ -64,7 +67,7 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
     const { name, role, bio, avatarUrl } = req.body;
-    
+
     const user = await prisma.user.update({
       where: { id },
       data: { name, role, bio, avatarUrl },
@@ -92,19 +95,22 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
 export const setPassword = async (req: Request, res: Response) => {
   try {
     const { token, password } = req.body;
+    if (!token || !password || password.length < 8) {
+      return res.status(400).json({ error: 'Token and a password of at least 8 characters are required' });
+    }
     const user = await prisma.user.findUnique({ where: { inviteToken: token } });
-    
+
     if (!user || !user.inviteTokenExpires || user.inviteTokenExpires < new Date()) {
       return res.status(400).json({ error: 'Invalid or expired invite token' });
     }
-    
+
     const hashedPassword = await hashPassword(password);
-    
+
     await prisma.user.update({
       where: { id: user.id },
       data: { password: hashedPassword, inviteToken: null, inviteTokenExpires: null }
     });
-    
+
     res.json({ message: 'Password set successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to set password' });
@@ -115,7 +121,7 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
     const { role } = req.body;
-    
+
     if (req.user?.userId === id) {
       return res.status(400).json({ error: 'Cannot change your own role' });
     }
@@ -162,18 +168,18 @@ export const updateSecurity = async (req: AuthRequest, res: Response) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const user = await prisma.user.findUnique({ where: { id: req.user?.userId } });
-    
+
     if (!user) return res.status(404).json({ error: 'User not found' });
-    
+
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) return res.status(400).json({ error: 'Incorrect current password' });
-    
+
     const hashedPassword = await hashPassword(newPassword);
     await prisma.user.update({
       where: { id: req.user?.userId },
       data: { password: hashedPassword }
     });
-    
+
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });

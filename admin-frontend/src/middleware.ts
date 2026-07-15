@@ -22,7 +22,8 @@ export async function middleware(request: NextRequest) {
     pathname === '/login' ||
     pathname === '/forgot-password' ||
     pathname.startsWith('/forgot-password/') ||
-    pathname === '/reset-password';
+    pathname === '/reset-password' ||
+    pathname.startsWith('/invite/');
 
   if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.includes('.')) {
     return NextResponse.next();
