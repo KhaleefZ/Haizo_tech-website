@@ -49,12 +49,17 @@ export default function LoginPage() {
       }
 
       // Set cookie for middleware
-      Cookies.set('haizotech_session', result.token, { expires: 1, path: '/' });
+      Cookies.set('haizotech_session', result.token, {
+        expires: 1,
+        path: '/',
+        secure: true,
+        sameSite: 'strict',
+      });
       localStorage.setItem('token', result.token);
-      
+
       // Update global state
       setRole(result.user.role);
-      
+
       router.push('/');
     } catch (err: any) {
       setError(err.message || 'An error occurred during login. Please try again.');
@@ -72,7 +77,7 @@ export default function LoginPage() {
         <div className="glass-card p-8 flex flex-col gap-6 relative overflow-hidden">
           {/* Subtle background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200px] h-[200px] bg-primary/20 blur-[100px] pointer-events-none rounded-full" />
-          
+
           <div className="flex flex-col items-center text-center gap-2 relative z-10">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-2 border border-primary/20">
               <ShieldAlert className="h-6 w-6 text-primary" />
@@ -140,7 +145,7 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-          
+
           <div className="relative z-10 text-center mt-2">
             <p className="text-xs text-muted-foreground">
               By logging in, you agree to our strictly enforced internal security policies.

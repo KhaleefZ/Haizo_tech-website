@@ -32,30 +32,30 @@ export const login = async (req: Request, res: Response) => {
 
 export const registerAdmin = async (req: Request, res: Response) => {
   try {
-    // Check if any user exists, if yes, prevent open registration
+    // Hard kill switch: disable unless explicitly allowed via env.
+    if (process.env.ALLOW_ADMIN_REGISTRATION !== 'true') {
+      return res.status(403).json({ error: 'Registration disabled.' });
+    }
+
     const count = await prisma.user.count();
     if (count > 0) {
       return res.status(403).json({ error: 'Registration closed. Initial admin already exists.' });
     }
 
     const { name, email, password } = req.body;
-    const hashedPassword = await hashPassword(password);
-    
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: 'SUPER_ADMIN'
-      }
-    });
+    if (!name || !email || !password || password.length < 8) {
+      return res.status(400).json({ error: 'Name, email, and a password of 8+ characters are required.' });
+    }
 
+    const hashedPassword = await hashPassword(password);
+    const user = await prisma.user.create({
+      data: { name, email, password: hashedPassword, role: 'SUPER_ADMIN' },
+    });
     res.status(201).json({ message: 'Super admin created successfully', user: { id: user.id, email: user.email } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
-
 // Step 1: Request a password reset code
 export const forgotPassword = async (req: Request, res: Response) => {
   try {
@@ -150,6 +150,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   try {
     const { resetToken, newPassword } = req.body;
     if (!resetToken || !newPassword) return res.status(400).json({ error: 'Token and new password are required' });
+    if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
 
     const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
 
