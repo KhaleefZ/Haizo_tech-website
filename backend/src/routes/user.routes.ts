@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { getUsers, getTeam, inviteUser, updateUser, deleteUser, updateUserRole, getProfile, updateProfile, updateSecurity, updatePreferences, setPassword } from '../controllers/user.controller';
+import { getUsers, getTeam, inviteUser, updateUser, deleteUser, updateUserRole, getProfile, updateProfile, updateSecurity, updatePreferences, setPassword, validateInvite } from '../controllers/user.controller';
 import { authenticate, requireRole } from '../middlewares/auth.middleware';
 
 const router = Router();
 
 // Public route for setting password via invite token
 router.post('/set-password', setPassword);
+router.get('/validate-invite', validateInvite);
 
 router.use(authenticate);
 // Profile routes (Any authenticated user)

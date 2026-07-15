@@ -63,6 +63,18 @@ export const inviteUser = async (req: Request, res: Response) => {
   }
 };
 
+export const validateInvite = async (req: Request, res: Response) => {
+  try {
+    const token = req.query.token as string;
+    if (!token) return res.status(400).json({ valid: false });
+    const user = await prisma.user.findUnique({ where: { inviteToken: token } });
+    const valid = Boolean(user && user.inviteTokenExpires && user.inviteTokenExpires > new Date());
+    res.json({ valid });
+  } catch {
+    res.status(500).json({ valid: false });
+  }
+};
+
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
