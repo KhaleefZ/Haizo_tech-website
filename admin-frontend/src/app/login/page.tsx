@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AnimatedSection } from '@/components/ui/AnimatedSection';
@@ -20,7 +19,6 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const router = useRouter();
   const { setRole } = useAppStore();
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -60,7 +58,8 @@ export default function LoginPage() {
       // Update global state
       setRole(result.user.role);
 
-      router.push('/');
+      // Full-page navigation so the middleware evaluates with the new cookie.
+      window.location.href = '/';
     } catch (err: any) {
       setError(err.message || 'An error occurred during login. Please try again.');
     }
