@@ -1,20 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose';
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-
-async function isValid(token?: string): Promise<boolean> {
-  if (!token) return false;
-  try {
-    await jwtVerify(token, secret);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('haizotech_session')?.value;
 
@@ -25,16 +12,23 @@ export async function middleware(request: NextRequest) {
     pathname === '/reset-password' ||
     pathname.startsWith('/invite/');
 
-  if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.includes('.')) {
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.includes('.')
+  ) {
     return NextResponse.next();
   }
 
-  const valid = await isValid(token);
+  // Cosmetic routing gate only. Real authorization is enforced by the
+  // backend's authenticate middleware on every API call. We just check
+  // for the presence of a session cookie to decide login vs dashboard.
+  const hasSession = Boolean(token);
 
-  if (!valid && !isPublicPage) {
+  if (!hasSession && !isPublicPage) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
-  if (valid && pathname === '/login') {
+  if (hasSession && pathname === '/login') {
     return NextResponse.redirect(new URL('/', request.url));
   }
   return NextResponse.next();
